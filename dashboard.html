@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ClassPilot | Management</title>
+<style>
+:root{--navy:#14243b;--mint:#52dfb1;--bg:#f4f7fb;--muted:#728096;--line:#e5eaf1}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:Arial,sans-serif;color:#18283d}button,input,select{font:inherit}button{cursor:pointer;border:0;border-radius:9px;padding:11px 14px;font-weight:700}.top{background:var(--navy);color:white;padding:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-size:22px;font-weight:800}.brand span{color:var(--mint)}.top small{color:#c4d0df}.wrap{max-width:1100px;margin:auto;padding:20px}.welcome{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}.welcome h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}.stat,.panel{background:white;border:1px solid var(--line);border-radius:15px;padding:17px;min-width:0}.stat label{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:9px;overflow-wrap:anywhere}.stat em{font-style:normal;color:#13a77c;font-size:12px}.layout{display:grid;grid-template-columns:1fr 1.6fr;gap:15px}.panel h2{font-size:17px;margin:0 0 15px}.field{margin-bottom:12px}.field label{display:block;font-size:12px;color:#536176;margin-bottom:6px}.field input,.field select,.search{width:100%;padding:11px;border:1px solid #dce3ed;border-radius:9px;background:#fff;min-width:0}.primary{background:var(--navy);color:white}.mint{background:var(--mint);color:#10263a}.secondary{background:#edf2f8;color:#23344b}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:16px}.tab{background:#e7edf5;color:#40516a}.tab.active{background:var(--navy);color:white}.tools{display:flex;gap:8px;margin-bottom:12px}.tools .search{flex:1}.tablewrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line);white-space:nowrap}th{font-size:11px;color:var(--muted);text-transform:uppercase}.pill{display:inline-block;border-radius:20px;padding:5px 8px;font-size:11px;background:#e3f8ef;color:#08784f}.pending{background:#fff0d6;color:#925c00}.empty{text-align:center;color:var(--muted);padding:28px 8px}.hide{display:none!important}.danger{background:#fff0f0;color:#b42323}.foot{text-align:center;padding:25px;color:var(--muted);font-size:12px}.notice{background:#fff7df;border:1px solid #f2dfa1;padding:12px;border-radius:10px;font-size:12px;color:#76551a;margin-bottom:15px}
+@media(max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.layout{grid-template-columns:1fr}.wrap{padding:13px}.top{padding:17px}.stat{padding:13px}.stat strong{font-size:22px}}
+</style>
+</head>
+<body>
+<header class="top"><div><div class="brand">Class<span>Pilot</span></div><small>Institute management workspace</small></div><button class="mint" onclick="showTab('students')">+ Student</button></header>
+<main class="wrap">
+<div class="welcome"><div><h1>Institute Dashboard</h1><div class="muted">Manage your class, one step at a time.</div></div><div class="muted" id="today"></div></div>
+<div class="notice">Demo version: records are stored in this browser on this device only. Export a backup regularly. Do not use real sensitive student data until secure cloud storage and login are added.</div>
+<section class="stats">
+<div class="stat"><label>Total Students</label><strong id="total">0</strong><em>Registered records</em></div>
+<div class="stat"><label>Fees Collected</label><strong id="collected">₹0</strong><em>Payments recorded</em></div>
+<div class="stat"><label>Fees Pending</label><strong id="pending">₹0</strong><em>Outstanding balance</em></div>
+<div class="stat"><label>Attendance Today</label><strong id="attend">0</strong><em>Present students</em></div>
+</section>
+<nav class="tabs">
+<button class="tab active" data-tab="students" onclick="showTab('students')">Students</button>
+<button class="tab" data-tab="fees" onclick="showTab('fees')">Fee Records</button>
+<button class="tab" data-tab="attendance" onclick="showTab('attendance')">Attendance</button>
+<button class="tab" data-tab="backup" onclick="showTab('backup')">Backup</button>
+</nav>
+<section id="students" class="tabpage">
+<div class="layout">
+<div class="panel"><h2 id="formTitle">Add a Student</h2><form id="studentForm">
+<input id="editId" type="hidden">
+<div class="field"><label>Student name *</label><input id="name" required maxlength="80" placeholder="Full name"></div>
+<div class="field"><label>Parent / guardian contact (optional)</label><input id="phone" inputmode="tel" maxlength="20" placeholder="Phone number"></div>
+<div class="field"><label>Course / batch</label><input id="course" maxlength="80" placeholder="e.g. Class 10 Maths"></div>
+<div class="field"><label>Total course fee (₹) *</label><input id="fee" type="number" min="0" max="100000000" step="1" required placeholder="e.g. 12000"></div>
+<button class="primary" type="submit" id="saveBtn">Save Student</button> <button class="secondary" type="button" onclick="resetForm()">Clear</button>
+</form></div>
+<div class="panel"><h2>Student Directory</h2><div class="tools"><input class="search" id="search" placeholder="Search name, batch or phone..." oninput="renderStudents()"></div><div class="tablewrap"><table><thead><tr><th>Student</th><th>Batch</th><th>Fee status</th><th>Actions</th></tr></thead><tbody id="studentRows"></tbody></table></div><div id="studentEmpty" class="empty">No students added yet.</div></div>
+</div>
+</section>
+<section id="fees" class="tabpage hide"><div class="panel"><h2>Record a Fee Payment</h2><form id="feeForm"><div class="field"><label>Student</label><select id="feeStudent" required></select></div><div class="field"><label>Amount paid (₹)</label><input id="amount" type="number" min="1" max="100000000" required></div><div class="field"><label>Payment date</label><input id="payDate" type="date" required></div><div class="field"><label>Payment note (optional)</label><input id="payNote" maxlength="100" placeholder="Cash, UPI, instalment..."></div><button class="primary">Save Payment</button></form></div><div class="panel" style="margin-top:15px"><h2>Payment History</h2><div class="tablewrap"><table><thead><tr><th>Date</th><th>Student</th><th>Amount</th><th>Note</th></tr></thead><tbody id="feeRows"></tbody></table></div><div id="feeEmpty" class="empty">No payments recorded.</div></div></section>
+<section id="attendance" class="tabpage hide"><div class="panel"><h2>Mark Attendance</h2><div class="field"><label>Date</label><input id="attDate" type="date"></div><div id="attList"></div><button class="primary" onclick="saveAttendance()">Save Attendance</button></div><div class="panel" style="margin-top:15px"><h2>Attendance Summary</h2><div id="attSummary" class="muted">Select a date to view attendance.</div></div></section>
+<section id="backup" class="tabpage hide"><div class="panel"><h2>Backup and Data</h2><p class="muted">Download a JSON backup of student records, fee payments and attendance. Keep it somewhere safe.</p><button class="primary" onclick="exportData()">Download Backup</button> <button class="secondary" onclick="document.getElementById('importFile').click()">Restore Backup</button><input id="importFile" type="file" accept=".json,application/json" class="hide"><hr style="border:0;border-top:1px solid #e5eaf1;margin:20px 0"><h2>Reset demo data</h2><p class="muted">Permanently clears records stored in this browser.</p><button class="danger" onclick="clearData()">Delete All Demo Data</button></div></section>
+</main><footer class="foot">ClassPilot · Coaching class management · Demo build</footer>
+<script>
+const $=id=>document.getElementById(id);
+const today=new Date().toISOString().slice(0,10);
+$('today').textContent=new Date().toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+$('payDate').value=today;$('attDate').value=today;
+let db={students:[],payments:[],attendance:{}};
+try{const old=JSON.parse(localStorage.getItem('classpilot_demo_v1')||'null');if(old&&Array.isArray(old.students)&&Array.isArray(old.payments)&&old.attendance)db=old}catch(e){}
+function persist(){localStorage.setItem('classpilot_demo_v1',JSON.stringify(db));renderAll()}
+function money(n){return '₹'+Number(n||0).toLocaleString('en-IN',{maximumFractionDigits:2})}
+function paid(s){return db.payments.filter(p=>p.studentId===s.id).reduce((a,p)=>a+Number(p.amount),0)}
+function balance(s){return Math.max(0,Number(s.fee)-paid(s))}
+function showTab(id){document.querySelectorAll('.tabpage').forEach(x=>x.classList.add('hide'));$(id).classList.remove('hide');document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x.dataset.tab===id));if(id==='attendance')renderAttendance()}
+function resetForm(){$('studentForm').reset();$('editId').value='';$('formTitle').textContent='Add a Student';$('saveBtn').textContent='Save Student'}
+$('studentForm').addEventListener('submit',e=>{e.preventDefault();let id=$('editId').value;let obj={id:id||('s'+Date.now()),name:$('name').value.trim(),phone:$('phone').value.trim(),course:$('course').value.trim(),fee:Number($('fee').value)};if(!obj.name||obj.fee<0)return alert('Check student name and fee.');if(id){db.students=db.students.map(s=>s.id===id?obj:s)}else db.students.push(obj);persist();resetForm();alert('Student saved successfully.')});
+function editStudent(id){let s=db.students.find(x=>x.id===id);if(!s)return;$('editId').value=s.id;$('name').value=s.name;$('phone').value=s.phone;$('course').value=s.course;$('fee').value=s.fee;$('formTitle').textContent='Edit Student';$('saveBtn').textContent='Update Student';showTab('students');window.scrollTo({top:0,behavior:'smooth'})}
+function deleteStudent(id){if(!confirm('Delete this student and their payment/attendance records?'))return;db.students=db.students.filter(s=>s.id!==id);db.payments=db.payments.filter(p=>p.studentId!==id);Object.keys(db.attendance).forEach(d=>delete db.attendance[d][id]);persist()}
+function renderStudents(){let q=$('search').value.toLowerCase();let rows=db.students.filter(s=>(s.name+' '+s.course+' '+s.phone).toLowerCase().includes(q));$('studentRows').innerHTML=rows.map(s=>'<tr><td><b>'+esc(s.name)+'</b><br><span class="muted">'+esc(s.phone||'No contact')+'</span></td><td>'+esc(s.course||'—')+'</td><td><span class="pill '+(balance(s)>0?'pending':'')+'">'+(balance(s)>0?money(balance(s))+' due':'Paid')+'</span></td><td><button class="secondary" onclick="editStudent('+JSON.stringify(s.id)+')">Edit</button> <button class="danger" onclick="deleteStudent('+JSON.stringify(s.id)+')">Delete</button></td></tr>').join('');$('studentEmpty').classList.toggle('hide',rows.length>0)}
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+$('feeForm').addEventListener('submit',e=>{e.preventDefault();let s=db.students.find(s=>s.id===$('feeStudent').value),amount=Number($('amount').value);if(!s)return alert('Add a student first.');if(!Number.isFinite(amount)||amount<=0)return alert('Enter a valid payment amount.');db.payments.push({id:'p'+Date.now(),studentId:s.id,amount,date:$('payDate').value,note:$('payNote').value.trim()});persist();$('amount').value='';$('payNote').value='';alert('Payment recorded.')});
+function renderFees(){$('feeStudent').innerHTML=db.students.map(s=>'<option value="'+esc(s.id)+'">'+esc(s.name)+' — due '+money(balance(s))+'</option>').join('');if(!db.students.length)$('feeStudent').innerHTML='<option value="">Add a student first</option>';$('feeRows').innerHTML=db.payments.slice().reverse().map(p=>{let s=db.students.find(s=>s.id===p.studentId);return '<tr><td>'+esc(p.date)+'</td><td>'+esc(s?s.name:'Deleted student')+'</td><td>'+money(p.amount)+'</td><td>'+esc(p.note||'—')+'</td></tr>'}).join('');$('feeEmpty').classList.toggle('hide',db.payments.length>0)}
+function renderAttendance(){let date=$('attDate').value||today;let day=db.attendance[date]||{};$('attList').innerHTML=db.students.map(s=>'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:13px 0;border-bottom:1px solid #e5eaf1"><div><b>'+esc(s.name)+'</b><div class="muted">'+esc(s.course||'No batch')+'</div></div><select data-att="'+esc(s.id)+'"><option value="Present" '+(day[s.id]==='Present'?'selected':'')+'>Present</option><option value="Absent" '+(day[s.id]==='Absent'?'selected':'')+'>Absent</option><option value="Not marked" '+(!day[s.id]||day[s.id]==='Not marked'?'selected':'')+'>Not marked</option></select></div>').join('');if(!db.students.length)$('attList').innerHTML='<div class="empty">Add students first.</div>';renderAttSummary()}
+function saveAttendance(){let date=$('attDate').value;if(!date)return alert('Select a date.');db.attendance[date]=db.attendance[date]||{};document.querySelectorAll('[data-att]').forEach(el=>{if(el.value==='Not marked')delete db.attendance[date][el.dataset.att];else db.attendance[date][el.dataset.att]=el.value});persist();alert('Attendance saved.')}
+function renderAttSummary(){let date=$('attDate').value||today,day=db.attendance[date]||{},present=Object.values(day).filter(x=>x==='Present').length,absent=Object.values(day).filter(x=>x==='Absent').length;$('attend').textContent=Object.entries(day).filter(([id,v])=>db.students.some(s=>s.id===id)&&v==='Present').length;$('attSummary').textContent=date+': '+present+' present · '+absent+' absent · '+db.students.length+' students'}
+$('attDate').addEventListener('change',renderAttendance);
+function renderAll(){$('total').textContent=db.students.length;$('collected').textContent=money(db.payments.reduce((a,p)=>a+Number(p.amount),0));$('pending').textContent=money(db.students.reduce((a,s)=>a+balance(s),0));renderStudents();renderFees();renderAttendance()}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='classpilot-backup-'+today+'.json';a.click();URL.revokeObjectURL(url)}
+$('importFile').addEventListener('change',async e=>{let f=e.target.files[0];if(!f)return;try{let x=JSON.parse(await f.text());if(!x||!Array.isArray(x.students)||!Array.isArray(x.payments)||!x.attendance||typeof x.attendance!=='object')throw Error();if(!confirm('Replace current demo data with this backup?'))return;db=x;persist();alert('Backup restored.')}catch(err){alert('Invalid ClassPilot backup file.')}e.target.value=''});
+function clearData(){if(!confirm('This deletes all ClassPilot demo records on this device. Continue?'))return;db={students:[],payments:[],attendance:{}};persist();resetForm()}
+renderAll();
+</script>
+</body>
+</html>
